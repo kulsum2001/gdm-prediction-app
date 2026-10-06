@@ -243,7 +243,7 @@ def predict():
                                    header=not os.path.exists('../user_data.csv'),
                                    index=False)
 
-                if risk_level == 'High':
+                if risk_level == 'High' and os.getenv('DISABLE_EMAIL_ALERTS', 'false').lower() != 'true':
                     try:
                         msg = MIMEText(
                             f'GDM Risk Assessment Result\n\nUser: {current_user.id}\n'
