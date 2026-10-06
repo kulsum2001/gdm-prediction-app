@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - GDM Risk Assessment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-teal-100 to-teal-200 min-h-screen flex items-center justify-center px-4">
+
+  <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="text-center mb-4">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="GDM Logo" class="mx-auto w-24 h-24 mb-2">
+      <h2 class="text-xl font-semibold text-gray-600">Gestational Diabetes Risk Assessment</h2>
+      <p class="text-sm text-gray-500">Login to access your health insights.</p>
+    </div>
+
+    <h1 class="text-3xl font-extrabold text-center text-teal-700 mb-6">Welcome Back</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <p class="text-sm text-center mb-4 {{ 'text-red-500' if category == 'error' else 'text-green-600' }}">
+            {{ message }}
+          </p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" class="space-y-5" onsubmit="return validateLoginForm()">
+      <div>
+        <label class="block mb-1 text-sm font-medium text-gray-700">Username</label>
+        <input id="login-username" type="text" name="username" required
+               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-sm font-medium text-gray-700">Password</label>
+        <input id="login-password" type="password" name="password" required
+               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent" />
+      </div>
+
+      <button type="submit"
+              class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 rounded-md transition duration-200">
+        Login
+      </button>
+    </form>
+
+    <p class="text-center text-sm text-gray-600 mt-4">
+      Don't have an account?
+      <a href="{{ url_for('register') }}" class="text-teal-600 hover:underline font-medium">Register</a>
+    </p>
+  </div>
+
+<script>
+function validateLoginForm() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+
+  if (!username || !password) {
+    alert('⚠️ Both fields are required!');
+    return false;
+  }
+  return true;
+}
+</script>
+
+</body>
+</html>

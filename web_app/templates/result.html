@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prediction Result</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out both;
+    }
+    .transition-theme {
+      transition: background-color 0.4s, color 0.4s;
+    }
+  </style>
+</head>
+<body id="page" class="bg-gray-100 text-gray-800 min-h-screen flex items-center justify-center px-4 py-6 transition-theme">
+
+  <div id="container" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-2xl text-center space-y-6 fade-in-up transition-theme">
+
+    <!-- Toggle Button -->
+    <div class="flex justify-end">
+      <button id="themeToggle" onclick="toggleTheme()"
+        class="text-sm bg-gray-200 text-gray-800 px-3 py-1 rounded-lg hover:bg-gray-300 transition transition-theme">
+        Toggle Dark Mode
+      </button>
+    </div>
+
+    <h1 class="text-2xl sm:text-3xl font-semibold text-teal-700 fade-in-up">GDM Risk Assessment Result</h1>
+
+    <p class="text-lg font-medium fade-in-up">
+      Your Risk Level:
+      <span class="{% if risk_level == 'High' %}text-red-600{% elif risk_level == 'Medium' %}text-yellow-500{% elif risk_level == 'Low' %}text-green-600{% else %}text-gray-500{% endif %} font-bold">
+        {{ risk_level }}
+      </span>
+    </p>
+
+    <!-- SHAP Explanation -->
+    {% if shap_explanation %}
+    <div class="relative mt-4 w-full fade-in-up">
+      <div id="shap-box" class="bg-blue-100 text-blue-800 px-4 py-2 rounded-md border border-blue-300 text-sm flex items-center justify-center transition-theme">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-7-3a1 1 0 10-2 0v1a1 1 0 002 0V7zm0 3a1 1 0 00-2 0v4a1 1 0 002 0v-4z" clip-rule="evenodd" />
+        </svg>
+        <span id="shap-text">{{ shap_explanation|safe }}</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- SHAP Plot -->
+    {% if plot_path %}
+    <div class="fade-in-up">
+      <img src="{{ url_for('static', filename=plot_path) }}"
+           alt="SHAP Explanation"
+           class="rounded-md mx-auto shadow-md max-w-full h-auto" />
+    </div>
+    {% else %}
+    <p class="text-gray-500 text-sm mt-2 fade-in-up">SHAP plot not available.</p>
+    {% endif %}
+
+<!-- SHAP Feature Insights -->
+    {% if shap_details %}
+    <div class="bg-gray-800 text-white rounded-lg p-4 mt-6 transition-all duration-500 dark:bg-slate-900">
+      <h2 class="text-white text-lg font-semibold mb-2 text-center">Top SHAP Feature Insights:</h2>
+      <ul class="text-sm list-disc list-inside space-y-1">
+        {% for line in shap_details %}
+          <li>🔸 {{ line }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Confidence Scores -->
+    <div class="text-sm space-y-3 pt-6 text-left fade-in-up">
+      <p class="text-center font-semibold">Confidence Scores:</p>
+
+      <div>
+        <p>Low: {{ confidence_scores['Low'] }}%</p>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="bg-green-500 h-2.5 rounded-full" style="width: {{ confidence_scores['Low'] }}%" title="{{ confidence_scores['Low'] }}%"></div>
+        </div>
+      </div>
+
+      <div>
+        <p>Medium: {{ confidence_scores['Medium'] }}%</p>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="bg-yellow-400 h-2.5 rounded-full" style="width: {{ confidence_scores['Medium'] }}%" title="{{ confidence_scores['Medium'] }}%"></div>
+        </div>
+      </div>
+
+      <div>
+        <p>High: {{ confidence_scores['High'] }}%</p>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="bg-red-500 h-2.5 rounded-full" style="width: {{ confidence_scores['High'] }}%" title="{{ confidence_scores['High'] }}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+   <div class="flex justify-center space-x-4 mt-6">
+  <a href="{{ url_for('index') }}"
+     class="px-4 py-2 bg-teal-600 text-white text-sm rounded-lg shadow-md hover:bg-teal-700">
+     ← Back to Assessment
+  </a>
+
+  <a href="{{ url_for('dashboard') }}"
+     class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg shadow-md hover:bg-indigo-700">
+     📊 View Dashboard
+  </a>
+</div>
+
+
+
+  <!-- JavaScript Theme Toggle -->
+  <script>
+    function toggleTheme() {
+      const page = document.getElementById('page');
+      const container = document.getElementById('container');
+      const shapBox = document.getElementById('shap-box');
+      const toggleBtn = document.getElementById('themeToggle');
+      const backBtn = document.getElementById('backBtn');
+
+      const isDark = page.classList.contains('bg-gray-900');
+
+      if (!isDark) {
+        // Switch to Dark
+        page.classList.replace('bg-gray-100', 'bg-gray-900');
+        page.classList.replace('text-gray-800', 'text-gray-200');
+
+        container.classList.replace('bg-white', 'bg-gray-800');
+        container.classList.replace('text-gray-800', 'text-gray-200');
+
+        if (shapBox) {
+          shapBox.classList.replace('bg-blue-100', 'bg-blue-900');
+          shapBox.classList.replace('text-blue-800', 'text-blue-100');
+          shapBox.classList.replace('border-blue-300', 'border-blue-600');
+        }
+
+        toggleBtn.classList.replace('bg-gray-200', 'bg-gray-700');
+        toggleBtn.classList.replace('text-gray-800', 'text-white');
+        toggleBtn.classList.replace('hover:bg-gray-300', 'hover:bg-gray-600');
+
+        backBtn.classList.replace('bg-teal-600', 'bg-teal-500');
+      } else {
+        // Switch back to Light
+        page.classList.replace('bg-gray-900', 'bg-gray-100');
+        page.classList.replace('text-gray-200', 'text-gray-800');
+
+        container.classList.replace('bg-gray-800', 'bg-white');
+        container.classList.replace('text-gray-200', 'text-gray-800');
+
+        if (shapBox) {
+          shapBox.classList.replace('bg-blue-900', 'bg-blue-100');
+          shapBox.classList.replace('text-blue-100', 'text-blue-800');
+          shapBox.classList.replace('border-blue-600', 'border-blue-300');
+        }
+
+        toggleBtn.classList.replace('bg-gray-700', 'bg-gray-200');
+        toggleBtn.classList.replace('text-white', 'text-gray-800');
+        toggleBtn.classList.replace('hover:bg-gray-600', 'hover:bg-gray-300');
+
+        backBtn.classList.replace('bg-teal-500', 'bg-teal-600');
+      }
+    }
+  </script>
+
+</body>
+</html>

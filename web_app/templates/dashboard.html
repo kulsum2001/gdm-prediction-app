@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" class="transition duration-300">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    };
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 p-6 transition duration-300">
+
+  <!-- Top Bar: Dark Mode + Logout -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-xl font-bold text-teal-700 dark:text-teal-300">📊 GDM User Dashboard</h1>
+    <div class="flex items-center space-x-3">
+      <!-- Dark Mode Toggle -->
+      <button onclick="toggleDarkMode()" id="themeToggleBtn" class="flex items-center px-3 py-1 rounded bg-teal-600 text-white hover:bg-teal-700 text-sm">
+        <span id="themeIcon" class="mr-2">🌙</span>
+        <span id="themeText">Toggle Dark Mode</span>
+      </button>
+      <!-- Logout Button -->
+      <a href="{{ url_for('logout') }}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded text-sm font-semibold">
+        Logout
+      </a>
+    </div>
+  </div>
+
+  {% if latest %}
+  <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mb-6 max-w-3xl mx-auto">
+    <h2 class="text-lg font-bold">Latest Prediction</h2>
+    <p class="mt-2">Risk Level:
+      <span class="font-bold {% if latest['Risk_Level']=='High' %}text-red-500
+                           {% elif latest['Risk_Level']=='Medium' %}text-yellow-400
+                           {% else %}text-green-500{% endif %}">
+        {{ latest['Risk_Level'] }}
+      </span>
+    </p>
+    <p>Age: {{ latest['Age'] }} | BMI: {{ latest['BMI'] }} | Glucose: {{ latest['Fasting_Glucose'] }}</p>
+    <p>Date: {{ latest['Timestamp'] }}</p>
+    <canvas id="confidenceChart" class="mt-4"></canvas>
+  </div>
+  {% endif %}
+
+  <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 max-w-5xl mx-auto">
+    <h2 class="text-lg font-bold mb-3">Past Assessments</h2>
+    {% if user_data|length > 0 %}
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="bg-gray-200 dark:bg-gray-700 text-left">
+            <th class="py-2 px-3">Date</th>
+            <th class="py-2 px-3">Age</th>
+            <th class="py-2 px-3">BMI</th>
+            <th class="py-2 px-3">Glucose</th>
+            <th class="py-2 px-3">Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in user_data|reverse %}
+          <tr class="border-t border-gray-200 dark:border-gray-600">
+            <td class="py-2 px-3">{{ row['Timestamp'] }}</td>
+            <td class="py-2 px-3">{{ row['Age'] }}</td>
+            <td class="py-2 px-3">{{ row['BMI'] }}</td>
+            <td class="py-2 px-3">{{ row['Fasting_Glucose'] }}</td>
+            <td class="py-2 px-3">{{ row['Risk_Level'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p>No records found yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="text-center mt-6">
+    <a href="{{ url_for('index') }}" class="text-sm text-teal-600 dark:text-teal-300 hover:underline">← Back to Prediction</a>
+  </div>
+
+  {% if latest %}
+  <script>
+    const ctx = document.getElementById('confidenceChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Low', 'Medium', 'High'],
+        datasets: [{
+          label: 'Confidence Score (%)',
+          data: [
+            {{ confidence_scores['Low'] if confidence_scores else 0 }},
+            {{ confidence_scores['Medium'] if confidence_scores else 0 }},
+            {{ confidence_scores['High'] if confidence_scores else 0 }}
+          ],
+          backgroundColor: ['#16a34a', '#facc15', '#dc2626'],
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, max: 100 } }
+      }
+    });
+  </script>
+  {% endif %}
+  {% if latest %}
+<div class="text-center mt-4">
+  <a href="{{ url_for('download_report') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    ⬇️ Download Report (PDF)
+  </a>
+</div>
+{% endif %}
+
+
+<script>
+  function toggleDarkMode() {
+    const htmlEl = document.documentElement;
+    htmlEl.classList.toggle('dark');
+
+    const iconEl = document.getElementById('themeIcon');
+    const textEl = document.getElementById('themeText');
+
+    if (htmlEl.classList.contains('dark')) {
+      iconEl.textContent = '☀️';
+      textEl.textContent = 'Toggle Light Mode';
+    } else {
+      iconEl.textContent = '🌙';
+      textEl.textContent = 'Toggle Dark Mode';
+    }
+  }
+
+  window.onload = () => {
+    const htmlEl = document.documentElement;
+    const iconEl = document.getElementById('themeIcon');
+    const textEl = document.getElementById('themeText');
+
+    if (htmlEl.classList.contains('dark')) {
+      iconEl.textContent = '☀️';
+      textEl.textContent = 'Toggle Light Mode';
+    } else {
+      iconEl.textContent = '🌙';
+      textEl.textContent = 'Toggle Dark Mode';
+    }
+  };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Additional custom styles */
+input, select {
+    border-color: #1ABC9C;
+} 
+.shap-info-text {
+    @apply text-center text-gray-600 text-base font-medium my-3;
+}

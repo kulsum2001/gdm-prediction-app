@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDM Risk Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<script>
+  function showTips() {
+    alert("📌 Health Tips:\n\n• Maintain a healthy weight and BMI\n• Eat balanced, low-sugar meals\n• Get regular exercise (like walking)\n• Monitor glucose levels\n• Stay hydrated\n• Follow up with your doctor regularly");
+  }
+</script>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold text-center mb-6 text-teal-600">GDM Risk Assessment</h1>
+        
+      
+        <!-- Error / Warning Message Container -->
+        <div id="alert-box" class="hidden mb-4 p-3 rounded-md"></div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="text-center mb-4 {{ 'text-red-500' if category == 'error' else 'text-green-500' }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+        <form method="POST" action="/predict" class="space-y-4" id="gdmForm">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Age (years):</label>
+                <input type="number" name="age" value="{{ age if age is defined else '' }}" class="mt-1 block w-full p-2 border rounded-md" min="0" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">BMI (kg/m²):</label>
+                <input type="number" name="bmi" value="{{ bmi if bmi is defined else '' }}" class="mt-1 block w-full p-2 border rounded-md" min="0" step="0.1" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Fasting Glucose (mg/dL):</label>
+                <input type="number" name="glucose" value="{{ glucose if glucose is defined else '' }}" class="mt-1 block w-full p-2 border rounded-md" min="0" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Family History of Diabetes:</label>
+                <select name="family_history" class="mt-1 block w-full p-2 border rounded-md" required>
+                    <option value="0" {% if family_history is defined and family_history == 0 %}selected{% endif %}>No</option>
+                    <option value="1" {% if family_history is defined and family_history == 1 %}selected{% endif %}>Yes</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Previous GDM:</label>
+                <select name="previous_gdm" class="mt-1 block w-full p-2 border rounded-md" required>
+                    <option value="0" {% if previous_gdm is defined and previous_gdm == 0 %}selected{% endif %}>No</option>
+                    <option value="1" {% if previous_gdm is defined and previous_gdm == 1 %}selected{% endif %}>Yes</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Doctor's Email:</label>
+                <input type="email" name="doctor_email" value="{{ doctor_email if doctor_email is defined else '' }}" class="mt-1 block w-full p-2 border rounded-md" required>
+            </div>
+            
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                <button type="submit" name="assess" value="assess" class="w-1/3 bg-teal-500 text-white p-2 rounded-md hover:bg-teal-600">Assess Risk</button>
+                <button type="button" onclick="showTips()" class="w-1/3 bg-blue-500 text-white p-2 rounded-md hover:bg-teal-600">💡 Tips</button>
+                
+            </div>
+        </form>
+    </div>
+
+    <script>
+      document.getElementById('gdmForm').addEventListener('submit', function(e) {
+        let age = parseFloat(document.querySelector('input[name="age"]').value);
+        let bmi = parseFloat(document.querySelector('input[name="bmi"]').value);
+        let glucose = parseFloat(document.querySelector('input[name="glucose"]').value);
+        let email = document.querySelector('input[name="doctor_email"]').value;
+        let alertBox = document.getElementById('alert-box');
+
+        let errors = [];
+        let warnings = [];
+
+        // Validation Rules
+        if (age <= 0) errors.push("Age must be greater than 0.");
+        else if (age < 18 || age > 50) warnings.push("⚠️ Age is outside 18–50 range. Proceed with caution.");
+
+        if (bmi < 10 || bmi > 60) errors.push("BMI must be between 10 and 60.");
+        if (glucose < 50 || glucose > 300) errors.push("Glucose must be between 50 and 300.");
+
+        let emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+        if (!emailPattern.test(email)) errors.push("Enter a valid email address.");
+
+        if (errors.length > 0) {
+          e.preventDefault();
+          alertBox.className = "mb-4 p-3 rounded-md bg-red-100 text-red-700 border border-red-300";
+          alertBox.innerHTML = "<strong>Error:</strong><br>" + errors.join("<br>");
+          alertBox.classList.remove('hidden');
+        } else if (warnings.length > 0) {
+          alertBox.className = "mb-4 p-3 rounded-md bg-yellow-100 text-yellow-700 border border-yellow-300";
+          alertBox.innerHTML = warnings.join("<br>");
+          alertBox.classList.remove('hidden');
+        }
+      });
+    </script>
+</body>
+</html>

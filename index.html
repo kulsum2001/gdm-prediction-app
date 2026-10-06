@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GDM Risk Prediction</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .input-group { margin: 10px 0; }
+        button { padding: 5px 10px; }
+        #result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>GDM Risk Prediction</h2>
+    <div class="input-group">
+        <label>Age: <input type="number" id="age" min="0"></label>
+    </div>
+    <div class="input-group">
+        <label>No of Pregnancy: <input type="number" id="noPregnancy" min="0"></label>
+    </div>
+    <div class="input-group">
+        <label>Gestation in Previous Pregnancy: <input type="number" id="gestationPrev" min="0"></label>
+    </div>
+    <div class="input-group">
+        <label>BMI: <input type="number" id="bmi" step="0.1" min="0"></label>
+    </div>
+    <div class="input-group">
+        <label>HDL: <input type="number" id="hdl" min="0"></label>
+    </div>
+    <div class="input-group">
+        <label>Family History (0/1): <input type="number" id="familyHistory" min="0" max="1"></label>
+    </div>
+    <div class="input-group">
+        <label>Unexplained Prenatal Loss (0/1): <input type="number" id="unexplainedLoss" min="0" max="1"></label>
+    </div>
+    <div class="input-group">
+        <label>Large Child or Birth Default (0/1): <input type="number" id="largeChild" min="0" max="1"></label>
+    </div>
+    <div class="input-group">
+        <label>PCOS (0/1): <input type="number" id="pcos" min="0" max="1"></label>
+    </div>
+    <div class="input-group">
+        <label>Systolic BP: <input type="number" id="sysBP" min="0"></label>
+    </div>
+    <div class="input-group">
+        <label>Diastolic BP: <input type="number" id="diaBP" min="0"></label>
+    </div>
+    <div class="input-group">
+        <label>OGTT: <input type="number" id="ogtt" min="0"></label>
+    </div>
+    <div class="input-group">
+        <label>Hemoglobin: <input type="number" id="hemoglobin" step="0.1" min="0"></label>
+    </div>
+    <div class="input-group">
+        <label>Sedentary Lifestyle (0/1): <input type="number" id="sedentary" min="0" max="1"></label>
+    </div>
+    <div class="input-group">
+        <label>Prediabetes (0/1): <input type="number" id="prediabetes" min="0" max="1"></label>
+    </div>
+    <button onclick="predictGDM()">Predict Risk</button>
+    <div id="result"></div>
+
+    <script>
+        async function predictGDM() {
+            const data = {
+                age: parseFloat(document.getElementById('age').value) || 0,
+                noPregnancy: parseFloat(document.getElementById('noPregnancy').value) || 0,
+                gestationPrev: parseFloat(document.getElementById('gestationPrev').value) || 0,
+                bmi: parseFloat(document.getElementById('bmi').value) || 0,
+                hdl: parseFloat(document.getElementById('hdl').value) || 0,
+                familyHistory: parseFloat(document.getElementById('familyHistory').value) || 0,
+                unexplainedLoss: parseFloat(document.getElementById('unexplainedLoss').value) || 0,
+                largeChild: parseFloat(document.getElementById('largeChild').value) || 0,
+                pcos: parseFloat(document.getElementById('pcos').value) || 0,
+                sysBP: parseFloat(document.getElementById('sysBP').value) || 0,
+                diaBP: parseFloat(document.getElementById('diaBP').value) || 0,
+                ogtt: parseFloat(document.getElementById('ogtt').value) || 0,
+                hemoglobin: parseFloat(document.getElementById('hemoglobin').value) || 0,
+                sedentary: parseFloat(document.getElementById('sedentary').value) || 0,
+                prediabetes: parseFloat(document.getElementById('prediabetes').value) || 0
+            };
+
+            const response = await fetch('http://localhost:5000/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            document.getElementById('result').innerText = `Risk: ${result.risk}, Confidence: ${result.confidence}`;
+        }
+    </script>
+</body>
+</html>

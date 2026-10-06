@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Secrets
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+
+# User data and credentials
+users.csv
+user_data.csv
+
+# Runtime logs
+web_app/error_log.txt
+
+# Generated reports and prediction images
+web_app/static/reports/
+web_app/static/images/shap_plot_*.pnggdm_venv/
+
+gdm_venv/
+
+# Local environment file
+web_app/.env.txt
+
+# Generated SHAP images
+web_app/static/images/shap_plot_*.png

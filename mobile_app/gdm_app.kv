@@ -1,0 +1,260 @@
+#:kivy 2.1.0
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+
+<CustomTextInput@TextInput>:
+    multiline: False
+    font_size: 16
+    padding: [10, 10]
+    background_color: 1, 1, 1, 1
+    foreground_color: 0.2, 0.2, 0.2, 1
+    cursor_color: 0.29, 0.76, 0.61, 1
+    border: 4, 4, 4, 4
+    canvas.before:
+        Color:
+            rgba: 0.29, 0.76, 0.61, 0.2
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10]
+
+<CustomButton@Button>:
+    font_size: 16
+    background_normal: ''
+    background_color: 0.29, 0.76, 0.61, 1
+    color: 1, 1, 1, 1
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10]
+        Color:
+            rgba: 0, 0, 0, 0.1
+        RoundedRectangle:
+            pos: self.pos[0] + 2, self.pos[1] + 2
+            size: self.size[0] - 4, self.size[1] - 4
+            radius: [10]
+
+<CustomCheckBox@CheckBox>:
+    color: 0.29, 0.76, 0.61, 1
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<CustomSpinner@Spinner>:
+    font_size: 16
+    background_color: 1, 1, 1, 1
+    color: 0.2, 0.2, 0.2, 1
+    canvas.before:
+        Color:
+            rgba: 0.29, 0.76, 0.61, 0.2
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10]
+
+<GDMForm>:
+    orientation: 'vertical'
+    padding: 20
+    spacing: 15
+    canvas.before:
+        Color:
+            rgba: 0.96, 0.98, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        text: 'GDM Risk Assessment'
+        font_size: 28
+        bold: True
+        color: 0.29, 0.76, 0.61, 1
+        size_hint_y: None
+        height: 60
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 12
+        padding: [10, 10]
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+                radius: [15]
+            Color:
+                rgba: 0, 0, 0, 0.05
+            RoundedRectangle:
+                pos: self.pos[0] + 2, self.pos[1] + 2
+                size: self.size[0] - 4, self.size[1] - 4
+                radius: [15]
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 10
+            Label:
+                text: 'Age (years):'
+                font_size: 16
+                color: 0.2, 0.2, 0.2, 1
+                size_hint_x: 0.4
+            CustomTextInput:
+                id: age_input
+                input_filter: 'int'
+                size_hint_x: 0.6
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 10
+            Label:
+                text: 'BMI (kg/m²):'
+                font_size: 16
+                color: 0.2, 0.2, 0.2, 1
+                size_hint_x: 0.4
+            CustomTextInput:
+                id: bmi_input
+                input_filter: 'float'
+                size_hint_x: 0.6
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 10
+            Label:
+                text: 'Fasting Glucose (mg/dL):'
+                font_size: 16
+                color: 0.2, 0.2, 0.2, 1
+                size_hint_x: 0.4
+            CustomTextInput:
+                id: glucose_input
+                input_filter: 'int'
+                size_hint_x: 0.6
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 10
+            Label:
+                text: 'Family History:'
+                font_size: 16
+                color: 0.2, 0.2, 0.2, 1
+                size_hint_x: 0.4
+            CustomCheckBox:
+                id: family_history
+                size_hint_x: 0.6
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 10
+            Label:
+                text: 'Previous GDM:'
+                font_size: 16
+                color: 0.2, 0.2, 0.2, 1
+                size_hint_x: 0.4
+            CustomCheckBox:
+                id: previous_gdm
+                size_hint_x: 0.6
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 10
+            Label:
+                text: "Doctor's Email:"
+                font_size: 16
+                color: 0.2, 0.2, 0.2, 1
+                size_hint_x: 0.4
+            CustomTextInput:
+                id: doctor_email_input
+                size_hint_x: 0.6
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 10
+            Label:
+                text: 'Model:'
+                font_size: 16
+                color: 0.2, 0.2, 0.2, 1
+                size_hint_x: 0.4
+            CustomSpinner:
+                id: model_spinner
+                values: ('Logistic Regression', 'Random Forest', 'XGBoost')
+                size_hint_x: 0.6
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 10
+            CustomButton:
+                text: 'Assess Risk'
+                size_hint_y: None
+                height: 50
+                size_hint_x: 0.33
+                on_press: root.assess_risk()
+            CustomButton:
+                text: 'Load Sample'
+                size_hint_y: None
+                height: 50
+                size_hint_x: 0.33
+                background_color: 0.18, 0.55, 0.34, 1
+                on_press: root.load_sample()
+            CustomButton:
+                text: 'Save Data'
+                size_hint_y: None
+                height: 50
+                size_hint_x: 0.33
+                background_color: 0.67, 0.67, 0.67, 1
+                on_press: root.save_data()
+
+        CustomButton:
+            text: 'Reset'
+            size_hint_y: None
+            height: 50
+            background_color: 0.67, 0.67, 0.67, 1
+            on_press: root.reset_form()
+
+        Label:
+            text: root.risk_level
+            font_size: 22
+            bold: True
+            color: 0.29 | 0.76 | 0.61 | 1 if root.risk_level != 'Error' else (1, 0, 0, 1)
+            size_hint_y: None
+            height: 40
+
+        Label:
+            text: root.risk_details
+            font_size: 16
+            color: 0.4, 0.4, 0.4, 1
+            size_hint_y: None
+            height: 100
+            text_size: self.width, None
+
+        Label:
+            text: 'Confidence Scores:'
+            font_size: 16
+            color: 0.2, 0.2, 0.2, 1
+            size_hint_y: None
+            height: 30
+
+        Label:
+            text: root.confidence_scores
+            font_size: 14
+            color: 0.4, 0.4, 0.4, 1
+            size_hint_y: None
+            height: 80
+            text_size: self.width, None
+
+        Label:
+            text: 'Feature Contributions (SHAP):'
+            font_size: 16
+            color: 0.2, 0.2, 0.2, 1
+            size_hint_y: None
+            height: 30
+
+        Label:
+            text: root.shap_explanation
+            font_size: 14
+            color: 0.4, 0.4, 0.4, 1
+            size_hint_y: None
+            height: 100
+            text_size: self.width, None 
